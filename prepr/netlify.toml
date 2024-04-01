@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "./.ntli/site/static/"
+[dev]
+  autoLaunch = false
+[functions]
+  directory = "./.ntli/site/netlify/functions/"
+  node_bundler = "esbuild"
+[[headers]]
+  for = "/ui/*"
+  [headers.values]
+    access-control-allow-headers = "*"
+    access-control-allow-methods = "*"
+    access-control-allow-origin = "*"

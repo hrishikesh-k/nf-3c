@@ -1,0 +1,2 @@
+schema:
+  - https://graphql.prepr.io/${PREPR_TOKEN}

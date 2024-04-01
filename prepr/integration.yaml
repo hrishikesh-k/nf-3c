@@ -1,0 +1,7 @@
+config:
+  description: Prepr CMS integration for Netlify Connect
+  integrationLevel: team
+  name: HK Netlify Connect Prepr
+  scopes:
+    all: true
+  slug: hk-netlify-connect-prepr

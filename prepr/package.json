@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@netlify/sdk": "1.34.0",
+    "date-fns": "3.6.0",
+    "dotenv": "16.4.5",
+    "wretch": "2.8.1"
+  },
+  "main": "./src/index.ts",
+  "name": "hk-netlify-connect-prepr",
+  "scripts": {
+    "build": "ntli build -a",
+    "dev": "ntli dev -c",
+    "preview": "ntli preview"
+  },
+  "type": "module"
+}

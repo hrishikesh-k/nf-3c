@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@types/node": "20.12.2",
+    "netlify-cli": "17.21.1",
+    "typescript": "5.4.3"
+  },
+  "name": "hk-netlify-connect-core-create",
+  "scripts": {
+    "prepr:build": "npm run build --workspace=prepr",
+    "prepr:dev": "npm run dev --workspace=prepr",
+    "prepr:preview": "npm run preview --workspace=prepr"
+  },
+  "type": "module",
+  "workspaces": [
+    "./prepr/"
+  ]
+}

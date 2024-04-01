@@ -1,10 +1,10 @@
 [build]
-  command = "npm run build"
-  publish = "./.ntli/site/static/"
+  command = "npm run prepr:build"
+  publish = ".ntli/site/static/"
 [dev]
   autoLaunch = false
 [functions]
-  directory = "./.ntli/site/netlify/functions/"
+  directory = ".ntli/site/netlify/functions/"
   node_bundler = "esbuild"
 [[headers]]
   for = "/ui/*"

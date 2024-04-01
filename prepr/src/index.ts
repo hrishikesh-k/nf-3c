@@ -24,13 +24,27 @@ async function syncArticles(apiToken : string, model : ModelDefinition['dataAPI'
             _slug : string
             title : string
           }>
+          content : Array<{
+            items : Array<{
+              _id : string
+              _type : string
+              url : string
+            }>
+          } | {
+            _id : string
+            code : string
+            language : 'JS' | 'TS' | 'RB'
+          } | {
+            _id : string
+            format : 'H1' | 'H2' | 'H3' | 'H4' | 'H5' | 'H6' | null
+          }>
           title : string
         }>
         total : number
       }
     }
   }
-  let allArticles : PreprArticlesRes = {
+  const allArticles : PreprArticlesRes = {
     data: {
       Articles: {
         items: [],
@@ -66,6 +80,24 @@ async function syncArticles(apiToken : string, model : ModelDefinition['dataAPI'
               _slug,
               title
             },
+            content {
+              ... on Assets {
+                items {
+                  _id,
+                  _type,
+                  url
+                }
+              },
+              ... on CodeBlock {
+                _id,
+                code,
+                language
+              },
+              ... on Text {
+                _id,
+                html
+              }
+            }
             title
           },
           total
@@ -114,16 +146,27 @@ async function syncArticles(apiToken : string, model : ModelDefinition['dataAPI'
         return {
           author_id: author._id,
           bio: author.bio,
-          name: author.full_name,
-          updated: author._changed_on
+          name: author.full_name
         }
       }),
+      body: article.content.reduce((body, content) => {
+        if ('items' in content) {
+          return content.items.reduce((contentBody, contentItem) => {
+            return `${contentBody}<img href="${contentItem.url}"/>`
+          }, '')
+        } else if ('code' in content) {
+          return `${body}<pre lang=${content.language.toLowerCase()}><code>${content.code}</code></pre>`
+        } else if ('html' in content) {
+          return `${body}${content.html}`
+        } else {
+          return body
+        }
+      }, ''),
       categories: article.categories.map(category => {
         return {
           category_id: category._id,
           slug: category._slug,
-          title: category.title,
-          updated: category._changed_on
+          title: category.title
         }
       }),
       id: article._id,
@@ -155,11 +198,7 @@ integrationConnector.event('createAllNodes', async (createAllNodesApi, configOpt
 })
 integrationConnector.event('updateNodes', async (updateNodesApi, configOptions) => {
   if (updateNodesApi.webhookBody.event === 'content_item.deleted') {
-    for (const model of updateNodesApi.models) {
-      if (model.name === 'Article') {
-        model.delete(updateNodesApi.webhookBody.payload.id)
-      }
-    }
+    updateNodesApi.models.Article.delete(updateNodesApi.webhookBody.payload.id)
   } else {
     const lastSync = await updateNodesApi.cache.get('lastSync')
     await syncArticles(configOptions.apiToken as string, updateNodesApi.models.Article, updateNodesApi.cache, lastSync)
@@ -183,13 +222,13 @@ integrationConnector.model(async modeler => {
             name: {
               required: true,
               type: 'String'
-            },
-            updated: {
-              required: true,
-              type: 'String'
             }
           }
         })
+      },
+      body: {
+        required: true,
+        type: 'String'
       },
       categories: {
         list: true,
@@ -204,10 +243,6 @@ integrationConnector.model(async modeler => {
               type: 'String'
             },
             title: {
-              required: true,
-              type: 'String'
-            },
-            updated: {
               required: true,
               type: 'String'
             }
